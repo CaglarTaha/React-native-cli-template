@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+import { Provider } from 'react-redux';
+import { store } from './store';
 import { StorageService } from './utils/storage';
 import SplashScreen from './components/SplashScreen';
 import OnboardingScreen from './components/OnboardingScreen';
@@ -35,25 +37,21 @@ const App: React.FC = () => {
     await StorageService.setShowOnboarding(false);
   };
 
-  if (showSplash) {
-    return <SplashScreen onFinish={handleFinishSplash} />;
-  }
-
-  if (showOnboarding) {
-    return <OnboardingScreen onFinish={handleFinishOnboarding} />;
-  }
-
-  if(isLoggedIn) {
-    return(
-      <NavigationContainer>
-        <TabNavigator />
-      </NavigationContainer>
-    )
-  }
-
-  else{
-    return <LoginScreen/>
-  }
+  return (
+    <Provider store={store}>
+      {showSplash ? (
+        <SplashScreen onFinish={handleFinishSplash} />
+      ) : showOnboarding ? (
+        <OnboardingScreen onFinish={handleFinishOnboarding} />
+      ) : isLoggedIn ? (
+        <NavigationContainer>
+          <TabNavigator />
+        </NavigationContainer>
+      ) : (
+        <LoginScreen />
+      )}
+    </Provider>
+  );
 };
 
 export default App;

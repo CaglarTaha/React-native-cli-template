@@ -10,6 +10,7 @@ import {
   PanResponder,
   Modal,
 } from 'react-native';
+import { useTheme } from '../utils/useTheme';
 
 const { height: screenHeight } = Dimensions.get('window');
 
@@ -26,6 +27,7 @@ const BottomDrawer: React.FC<BottomDrawerProps> = ({
   title = "Bottom Drawer",
   children,
 }) => {
+  const { colors } = useTheme();
   const translateY = useRef(new Animated.Value(screenHeight)).current;
   const backdropOpacity = useRef(new Animated.Value(0)).current;
   const [modalVisible, setModalVisible] = useState(false);
@@ -109,6 +111,96 @@ const BottomDrawer: React.FC<BottomDrawerProps> = ({
     }
   }, [isVisible]);
 
+  const styles = StyleSheet.create({
+    overlay: {
+      flex: 1,
+      justifyContent: 'flex-end',
+    },
+    backdrop: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    drawer: {
+      backgroundColor: colors.surface,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      maxHeight: screenHeight * 0.8,
+      shadowColor: colors.shadowColor,
+      shadowOffset: {
+        width: 0,
+        height: -2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 10,
+      elevation: 1000,
+    },
+    handle: {
+      paddingVertical: 15,
+      paddingHorizontal: 50,
+      alignSelf: 'center',
+    },
+    handleBar: {
+      width: 40,
+      height: 4,
+      backgroundColor: colors.border,
+      borderRadius: 2,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingVertical: 15,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.text,
+    },
+    closeButton: {
+      width: 30,
+      height: 30,
+      borderRadius: 15,
+      backgroundColor: colors.background,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    closeText: {
+      fontSize: 16,
+      color: colors.textSecondary,
+      fontWeight: '600',
+    },
+    content: {
+      padding: 20,
+      paddingBottom: 40,
+    },
+    defaultContent: {
+      alignItems: 'center',
+      paddingVertical: 40,
+    },
+    defaultText: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 8,
+    },
+    defaultSubtext: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      lineHeight: 20,
+    },
+    instructionText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      marginTop: 15,
+      fontStyle: 'italic',
+    },
+  });
+
   return (
     <Modal
       visible={modalVisible}
@@ -165,95 +257,5 @@ const BottomDrawer: React.FC<BottomDrawerProps> = ({
     </Modal>
   );
 };
-
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  drawer: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: screenHeight * 0.8,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: -2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 1000,
-  },
-  handle: {
-    paddingVertical: 15,
-    paddingHorizontal: 50,
-    alignSelf: 'center',
-  },
-  handleBar: {
-    width: 40,
-    height: 4,
-    backgroundColor: '#ddd',
-    borderRadius: 2,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-  },
-  closeButton: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  closeText: {
-    fontSize: 16,
-    color: '#666',
-    fontWeight: '600',
-  },
-  content: {
-    padding: 20,
-    paddingBottom: 40,
-  },
-  defaultContent: {
-    alignItems: 'center',
-    paddingVertical: 40,
-  },
-  defaultText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-  },
-  defaultSubtext: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  instructionText: {
-    fontSize: 12,
-    color: '#999',
-    textAlign: 'center',
-    marginTop: 15,
-    fontStyle: 'italic',
-  },
-});
 
 export default BottomDrawer;

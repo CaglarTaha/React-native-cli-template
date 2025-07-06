@@ -1,115 +1,188 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, Switch, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { StorageService } from '../utils/storage';
+import React from 'react';
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
+import Icon from '@react-native-vector-icons/fontawesome6';
+import { useTheme } from '../utils/useTheme';
+import { useAppDispatch } from '../store';
+import { logoutUser } from '../store/slices/authSlice';
 
-const SettingsScreen: React.FC = () => {
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [darkModeEnabled, setDarkModeEnabled] = useState(false);
-  const [locationEnabled, setLocationEnabled] = useState(false);
+interface SettingItem {
+  title: string;
+  subtitle: string;
+  icon: string;
+  type: 'info' | 'arrow';
+  onPress?: () => void;
+  danger?: boolean;
+}
+
+const SettingsScreen = () => {
+  const { colors, isDark } = useTheme();
+  const dispatch = useAppDispatch();
 
   const handleLogout = () => {
-    Alert.alert(
-      "Çıkış Yap",
-      "Çıkış yapmak istediğinize emin misiniz?",
-      [
+    dispatch(logoutUser());
+  };
+
+  const settingsSections = [
+    {
+      title: 'Tema Bilgisi',
+      items: [
         {
-          text: "İptal",
-          style: "cancel"
+          title: 'Tema Modu',
+          subtitle: `Şu an ${isDark ? 'Dark' : 'Light'} mode aktif (Sistem otomatik)`,
+          icon: isDark ? 'moon' : 'sun',
+          type: 'info' as const,
+        },
+      ],
+    },
+    {
+      title: 'Hesap',
+      items: [
+        {
+          title: 'Profil Ayarları',
+          subtitle: 'Profil bilgilerini düzenle',
+          icon: 'user-gear',
+          type: 'arrow' as const,
+          onPress: () => console.log('Profil ayarları'),
         },
         {
-          text: "Çıkış Yap",
-          style: "destructive",
-          onPress: async () => {
-            await StorageService.setIsLoggedIn(false);
-            // App will automatically navigate to login screen
-          }
-        }
-      ]
-    );
-  };
+          title: 'Güvenlik',
+          subtitle: 'Şifre ve güvenlik ayarları',
+          icon: 'shield-halved',
+          type: 'arrow' as const,
+          onPress: () => console.log('Güvenlik ayarları'),
+        },
+      ],
+    },
+    {
+      title: 'Uygulama',
+      items: [
+        {
+          title: 'Bildirimler',
+          subtitle: 'Bildirim tercihlerini yönet',
+          icon: 'bell',
+          type: 'arrow' as const,
+          onPress: () => console.log('Bildirim ayarları'),
+        },
+        {
+          title: 'Gizlilik',
+          subtitle: 'Gizlilik ve veri ayarları',
+          icon: 'lock',
+          type: 'arrow' as const,
+          onPress: () => console.log('Gizlilik ayarları'),
+        },
+        {
+          title: 'Hakkında',
+          subtitle: 'Uygulama bilgileri',
+          icon: 'circle-info',
+          type: 'arrow' as const,
+          onPress: () => console.log('Hakkında'),
+        },
+      ],
+    },
+    {
+      title: 'Diğer',
+      items: [
+        {
+          title: 'Çıkış Yap',
+          subtitle: 'Hesabından çıkış yap',
+          icon: 'right-from-bracket',
+          type: 'arrow' as const,
+          onPress: handleLogout,
+          danger: true,
+        },
+      ],
+    },
+  ];
+
+  const styles = createStyles(colors);
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
-        <Text style={styles.title}>Ayarlar</Text>
-        
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Genel</Text>
+          <Text style={styles.title}>Ayarlar</Text>
           
-          <View style={styles.settingItem}>
-            <Text style={styles.settingLabel}>Bildirimler</Text>
-            <Switch
-              value={notificationsEnabled}
-              onValueChange={setNotificationsEnabled}
-              trackColor={{ false: '#767577', true: '#3498db' }}
-              thumbColor={notificationsEnabled ? '#fff' : '#f4f3f4'}
-            />
+          {/* Theme Info Card */}
+          <View style={styles.themeCard}>
+            <View style={styles.themeCardHeader}>
+              <Icon 
+                name={isDark ? 'moon' : 'sun'} 
+                size={24} 
+                color={colors.primary} 
+                iconStyle="solid" 
+              />
+              <Text style={styles.themeCardTitle}>
+                {isDark ? 'Dark Mode' : 'Light Mode'} Aktif
+              </Text>
+            </View>
+            <Text style={styles.themeCardSubtitle}>
+              Tema otomatik olarak sistem ayarınızı takip ediyor. Cihazınızın tema ayarını değiştirerek uygulamanın temasını değiştirebilirsiniz.
+            </Text>
           </View>
-          
-          <View style={styles.settingItem}>
-            <Text style={styles.settingLabel}>Koyu Tema</Text>
-            <Switch
-              value={darkModeEnabled}
-              onValueChange={setDarkModeEnabled}
-              trackColor={{ false: '#767577', true: '#3498db' }}
-              thumbColor={darkModeEnabled ? '#fff' : '#f4f3f4'}
-            />
-          </View>
-          
-          <View style={styles.settingItem}>
-            <Text style={styles.settingLabel}>Konum Servisleri</Text>
-            <Switch
-              value={locationEnabled}
-              onValueChange={setLocationEnabled}
-              trackColor={{ false: '#767577', true: '#3498db' }}
-              thumbColor={locationEnabled ? '#fff' : '#f4f3f4'}
-            />
-          </View>
-        </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Hesap</Text>
-          
-          <TouchableOpacity style={styles.settingButton}>
-            <Text style={styles.settingButtonText}>Şifremi Değiştir</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.settingButton}>
-            <Text style={styles.settingButtonText}>Hesabımı Sil</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <Text style={styles.logoutButtonText}>Çıkış Yap</Text>
-          </TouchableOpacity>
+          {/* Settings Sections */}
+          {settingsSections.map((section, sectionIndex) => (
+            <View key={sectionIndex} style={styles.section}>
+              <Text style={styles.sectionTitle}>{section.title}</Text>
+              {section.items.map((item: SettingItem, itemIndex) => (
+                <TouchableOpacity
+                  key={itemIndex}
+                  style={[
+                    styles.settingItem,
+                    item.danger && styles.settingItemDanger,
+                    item.type === 'info' && styles.settingItemInfo,
+                  ]}
+                  onPress={item.onPress}
+                  disabled={item.type === 'info'}
+                >
+                  <View style={styles.settingItemLeft}>
+                    <View style={[
+                      styles.settingIcon,
+                      { backgroundColor: item.danger ? colors.error + '20' : colors.primary + '20' }
+                    ]}>
+                      <Icon 
+                        name={item.icon as any} 
+                        size={18} 
+                        color={item.danger ? colors.error : colors.primary} 
+                        iconStyle="solid" 
+                      />
+                    </View>
+                    <View style={styles.settingText}>
+                      <Text style={[
+                        styles.settingTitle,
+                        item.danger && styles.settingTitleDanger,
+                      ]}>
+                        {item.title}
+                      </Text>
+                      <Text style={styles.settingSubtitle}>{item.subtitle}</Text>
+                    </View>
+                  </View>
+                  
+                  {item.type === 'arrow' && (
+                    <View style={styles.settingItemRight}>
+                      <Icon 
+                        name="chevron-right" 
+                        size={14} 
+                        color={colors.textSecondary} 
+                        iconStyle="solid" 
+                      />
+                    </View>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          ))}
         </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Hakkında</Text>
-          
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Versiyon</Text>
-            <Text style={styles.infoValue}>1.0.0</Text>
-          </View>
-          
-          <TouchableOpacity style={styles.settingButton}>
-            <Text style={styles.settingButtonText}>Kullanım Şartları</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.settingButton}>
-            <Text style={styles.settingButtonText}>Gizlilik Politikası</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.background,
+    marginBottom: 50,
   },
   scrollView: {
     flex: 1,
@@ -120,102 +193,103 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 30,
+    color: colors.text,
+    marginBottom: 24,
   },
-  section: {
-    marginBottom: 30,
+  themeCard: {
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: colors.border,
+    shadowColor: colors.shadowColor,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
   },
-  sectionTitle: {
+  themeCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    gap: 10,
+  },
+  themeCardTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
-    marginBottom: 15,
+    color: colors.text,
+  },
+  themeCardSubtitle: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    lineHeight: 20,
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text,
+    marginBottom: 12,
+    marginLeft: 4,
   },
   settingItem: {
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 8,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: colors.border,
+    shadowColor: colors.shadowColor,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
     shadowRadius: 2,
-    elevation: 2,
+    elevation: 1,
   },
-  settingLabel: {
-    fontSize: 16,
-    color: '#333',
+  settingItemDanger: {
+    borderColor: colors.error + '30',
   },
-  settingButton: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+  settingItemInfo: {
+    opacity: 0.8,
   },
-  settingButtonText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  infoItem: {
+  settingItemLeft: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    flex: 1,
   },
-  infoLabel: {
-    fontSize: 16,
-    color: '#333',
+  settingIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
   },
-  infoValue: {
+  settingText: {
+    flex: 1,
+  },
+  settingTitle: {
     fontSize: 16,
-    color: '#666',
     fontWeight: '500',
+    color: colors.text,
+    marginBottom: 2,
   },
-  logoutButton: {
-    backgroundColor: '#e74c3c',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+  settingTitleDanger: {
+    color: colors.error,
   },
-  logoutButtonText: {
-    fontSize: 16,
-    color: '#fff',
-    fontWeight: '600',
-    textAlign: 'center',
+  settingSubtitle: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    lineHeight: 18,
+  },
+  settingItemRight: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

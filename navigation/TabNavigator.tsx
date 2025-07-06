@@ -5,29 +5,32 @@ import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import Icon from '@react-native-vector-icons/fontawesome6';
+import { useTheme } from '../utils/useTheme';
 
 const Tab = createBottomTabNavigator();
 
 const TabNavigator: React.FC = () => {
+  const { colors } = useTheme();
+
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <Tab.Navigator
         screenOptions={{
-          tabBarActiveTintColor: '#3498db',
-          tabBarInactiveTintColor: '#8e8e93',
+          tabBarActiveTintColor: colors.tabBarActive,
+          tabBarInactiveTintColor: colors.tabBarInactive,
           tabBarStyle: {
-            backgroundColor: '#fff',
+            backgroundColor: colors.tabBarBackground,
             paddingTop: 5,
             height: Platform.OS === 'ios' ? 85 : 60,
             paddingBottom: Platform.OS === 'ios' ? 30 : 5,
             borderTopWidth: 1,
-            borderTopColor: '#e0e0e0',
+            borderTopColor: colors.border,
             position: 'absolute',
             elevation: 5,
             zIndex: 1000,
             shadowOpacity: 0.1,
             shadowRadius: 4,
-            shadowColor: '#000',
+            shadowColor: colors.shadowColor,
             shadowOffset: { width: 0, height: -3 },
           },
           tabBarItemStyle: {
@@ -45,7 +48,7 @@ const TabNavigator: React.FC = () => {
             ),
           }}
         />
-                <Tab.Screen 
+        <Tab.Screen 
           name="Profil" 
           component={ProfileScreen}
           options={{
